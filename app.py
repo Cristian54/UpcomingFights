@@ -9,9 +9,10 @@ def home_page():
 
 @app.route('/rankings')
 def rankings():
-    rankings = WebScraper.getRankings(self=0)
+    rankings = WebScraper.getRankings()
     ranks = ['C', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    return render_template('rankings.html', Ranks = ranks, TBRB = rankings[0][0], Ring = rankings[1][0], WBA = rankings[2][0], WBC = rankings[3][0], IBF = rankings[4][0], WBO = rankings[5][0])
+    # WBA HW = rankings[2][0], so cruiser would be [2][1]
+    return render_template('rankings.html', Ranks = ranks, TBRB = rankings[0], Ring = rankings[1], WBA = rankings[2], WBC = rankings[3], IBF = rankings[4], WBO = rankings[5])
 
 
 if __name__ == "__main__":

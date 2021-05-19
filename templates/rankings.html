@@ -12,11 +12,20 @@
 </head>
 
 
+<body>
 <div>
 
     <div style="overflow-x:auto;" class="container">
 
-    <table style="width:100%">
+    <h3 id="heavyweight">
+        <span>Heavyweight (200+ lbs)</span>
+    </h3>
+
+    <!--<p>Go to the
+        <a href="#heavyweight">hw</a>
+    </p>-->
+
+    <table style="width: 100%;">
       <tr>
         <th>Rank</th>
         <th>TBRB</th>
@@ -28,12 +37,12 @@
       </tr>
 
       {% for rank in  Ranks%}
-        {% set TBRB = TBRB[loop.index-1] %}
-        {% set Ring = Ring[loop.index-1] %}
-        {% set WBA = WBA[loop.index-1] %}
-        {% set WBC = WBC[loop.index-1] %}
-        {% set IBF = IBF[loop.index-1] %}
-        {% set WBO = WBO[loop.index-1] %}
+        {% set TBRB = TBRB[0][loop.index-1] %}
+        {% set Ring = Ring[0][loop.index-1] %}
+        {% set WBA = WBA[0][loop.index-1] %}
+        {% set WBC = WBC[0][loop.index-1] %}
+        {% set IBF = IBF[0][loop.index-1] %}
+        {% set WBO = WBO[0][loop.index-1] %}
       <tr>
           <td>{{ rank }}</td>
           <td>{{ TBRB }}</td>
@@ -47,19 +56,592 @@
 
     </table>
 
+
+    <h3 id="cruiserweight">
+        <span>Cruiserweight (200 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[1][loop.index-1] %}
+        {% set Ring = Ring[1][loop.index-1] %}
+        {% set WBA = WBA[1][loop.index-1] %}
+        {% set WBC = WBC[1][loop.index-1] %}
+        {% set IBF = IBF[1][loop.index-1] %}
+        {% set WBO = WBO[1][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="lightHeavy">
+        <span>Light Heavyweight (175 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[2][loop.index-1] %}
+        {% set Ring = Ring[2][loop.index-1] %}
+        {% set WBA = WBA[2][loop.index-1] %}
+        {% set WBC = WBC[2][loop.index-1] %}
+        {% set IBF = IBF[2][loop.index-1] %}
+        {% set WBO = WBO[2][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="superMiddle">
+        <span>Super Middleweight (168 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[3][loop.index-1] %}
+        {% set Ring = Ring[3][loop.index-1] %}
+        {% set WBA = WBA[3][loop.index-1] %}
+        {% set WBC = WBC[3][loop.index-1] %}
+        {% set IBF = IBF[3][loop.index-1] %}
+        {% set WBO = WBO[3][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="middleweight">
+        <span>Middleweight (160 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[4][loop.index-1] %}
+        {% set Ring = Ring[4][loop.index-1] %}
+        {% set WBA = WBA[4][loop.index-1] %}
+        {% set WBC = WBC[4][loop.index-1] %}
+        {% set IBF = IBF[4][loop.index-1] %}
+        {% set WBO = WBO[4][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="lightMiddle">
+        <span>Light Middleweight (154 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[5][loop.index-1] %}
+        {% set Ring = Ring[5][loop.index-1] %}
+        {% set WBA = WBA[5][loop.index-1] %}
+        {% set WBC = WBC[5][loop.index-1] %}
+        {% set IBF = IBF[5][loop.index-1] %}
+        {% set WBO = WBO[5][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="welterweight">
+        <span>Welterweight (147 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[6][loop.index-1] %}
+        {% set Ring = Ring[6][loop.index-1] %}
+        {% set WBA = WBA[6][loop.index-1] %}
+        {% set WBC = WBC[6][loop.index-1] %}
+        {% set IBF = IBF[6][loop.index-1] %}
+        {% set WBO = WBO[6][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="superLight">
+        <span>Super Lightweight (140 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[7][loop.index-1] %}
+        {% set Ring = Ring[7][loop.index-1] %}
+        {% set WBA = WBA[7][loop.index-1] %}
+        {% set WBC = WBC[7][loop.index-1] %}
+        {% set IBF = IBF[7][loop.index-1] %}
+        {% set WBO = WBO[7][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="lightweight">
+        <span>Lightweight (135 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[8][loop.index-1] %}
+        {% set Ring = Ring[8][loop.index-1] %}
+        {% set WBA = WBA[8][loop.index-1] %}
+        {% set WBC = WBC[8][loop.index-1] %}
+        {% set IBF = IBF[8][loop.index-1] %}
+        {% set WBO = WBO[8][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="superFeather">
+        <span>Super Featherweight (130 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[9][loop.index-1] %}
+        {% set Ring = Ring[9][loop.index-1] %}
+        {% set WBA = WBA[9][loop.index-1] %}
+        {% set WBC = WBC[9][loop.index-1] %}
+        {% set IBF = IBF[9][loop.index-1] %}
+        {% set WBO = WBO[9][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+
+    <h3 id="featherweight">
+        <span>Featherweight (126 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[10][loop.index-1] %}
+        {% set Ring = Ring[10][loop.index-1] %}
+        {% set WBA = WBA[10][loop.index-1] %}
+        {% set WBC = WBC[10][loop.index-1] %}
+        {% set IBF = IBF[10][loop.index-1] %}
+        {% set WBO = WBO[10][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="superBantam">
+        <span>Super Bantamweight (122 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[11][loop.index-1] %}
+        {% set Ring = Ring[11][loop.index-1] %}
+        {% set WBA = WBA[11][loop.index-1] %}
+        {% set WBC = WBC[11][loop.index-1] %}
+        {% set IBF = IBF[11][loop.index-1] %}
+        {% set WBO = WBO[11][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="bantamweight">
+        <span>Bantamweight (118 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[12][loop.index-1] %}
+        {% set Ring = Ring[12][loop.index-1] %}
+        {% set WBA = WBA[12][loop.index-1] %}
+        {% set WBC = WBC[12][loop.index-1] %}
+        {% set IBF = IBF[12][loop.index-1] %}
+        {% set WBO = WBO[12][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="superFly">
+        <span>Super Flyweight (115 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[13][loop.index-1] %}
+        {% set Ring = Ring[13][loop.index-1] %}
+        {% set WBA = WBA[13][loop.index-1] %}
+        {% set WBC = WBC[13][loop.index-1] %}
+        {% set IBF = IBF[13][loop.index-1] %}
+        {% set WBO = WBO[13][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="flyweight">
+        <span>Flyweight (112 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[14][loop.index-1] %}
+        {% set Ring = Ring[14][loop.index-1] %}
+        {% set WBA = WBA[14][loop.index-1] %}
+        {% set WBC = WBC[14][loop.index-1] %}
+        {% set IBF = IBF[14][loop.index-1] %}
+        {% set WBO = WBO[14][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="lightFly">
+        <span>Light Flyweight (108 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[15][loop.index-1] %}
+        {% set Ring = Ring[15][loop.index-1] %}
+        {% set WBA = WBA[15][loop.index-1] %}
+        {% set WBC = WBC[15][loop.index-1] %}
+        {% set IBF = IBF[15][loop.index-1] %}
+        {% set WBO = WBO[15][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+    <h3 id="minimumweight">
+        <span>Minimumweight (105 lbs)</span>
+    </h3>
+
+    <table style="width:100%">
+      <tr>
+        <th>Rank</th>
+        <th>TBRB</th>
+        <th>The Ring</th>
+        <th>WBA</th>
+        <th>WBC</th>
+        <th>IBF</th>
+        <th>WBO</th>
+      </tr>
+
+      {% for rank in  Ranks%}
+        {% set TBRB = TBRB[16][loop.index-1] %}
+        {% set Ring = Ring[16][loop.index-1] %}
+        {% set WBA = WBA[16][loop.index-1] %}
+        {% set WBC = WBC[16][loop.index-1] %}
+        {% set IBF = IBF[16][loop.index-1] %}
+        {% set WBO = WBO[16][loop.index-1] %}
+      <tr>
+          <td>{{ rank }}</td>
+          <td>{{ TBRB }}</td>
+          <td> {{ Ring }}</td>
+          <td>{{ WBA }}</td>
+          <td>{{ WBC }}</td>
+          <td>{{ IBF }}</td>
+          <td>{{ WBO }}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+
     </div>
-</div> 
+</div>
+</body> 
 
 <style>
-  table {
-    margin-bottom: 30px;
-  }
-  th, td {
-    padding: 15px;
-    text-align: left;
-    border-bottom: 1px solid rgb(5, 5, 5);
-  }
-  tr:hover {background-color: #cecece;}
+    body {
+        background-color: #fffbfb;
+    }
+    table {
+        border-collapse: collapse;
+        border: 1px solid black;
+        margin-bottom: 50px;
+    }
+    th {
+        background-color: #07084b;
+        color: white;
+    }
+    th, td {
+        padding: 15px;
+        text-align: center;
+        border: 1px solid rgb(5, 5, 5);
+    }
+    tr:hover {background-color: #cecece;}
 </style>
 
 </html>

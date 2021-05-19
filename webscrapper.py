@@ -2,7 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 
 class WebScraper: 
-    def getRankings(self):
+    @staticmethod
+    def getRankings():
         URL = 'https://en.wikipedia.org/wiki/List_of_current_boxing_rankings'
         page = requests.get(URL)
 
