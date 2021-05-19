@@ -36,13 +36,19 @@ class WebScraper:
                     tenthRanked = [cols[1], cols[2], cols[3], cols[4], cols[5], cols[6]]
                     
                     if counter < 10:
+                        if '(S)' in cols[3]:
+                            param = cols[3].split("(S)", 1)
+                            tempWBA.append(param[0])
+                        else: 
+                            tempWBA.append(cols[3])
+                            
                         tempTBRB.append(cols[1])
                         tempRING.append(cols[2])
-                        tempWBA.append(cols[3])
                         tempWBC.append(cols[4])
                         tempIBF.append(cols[5])
                         tempWBO.append(cols[6])
                         counter += 1
+                        
                     else:
                         counter = 0
                         
