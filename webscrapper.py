@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-class WebScraper: 
+class WebScrapper: 
     @staticmethod
     def getRankings():
         URL = 'https://en.wikipedia.org/wiki/List_of_current_boxing_rankings'
@@ -17,7 +17,8 @@ class WebScraper:
         WBC = [] 
         IBF = []
         WBO = []
-         
+        colsHtml = []
+        
         for table in tables:
             table_body = table.find('tbody')
             rows = table_body.find_all('tr')
@@ -32,6 +33,7 @@ class WebScraper:
             
             for row in rows:
                 cols = row.find_all('td')
+                colsHtml.append(cols)
                 cols = [ele.text.strip() for ele in cols]
                 if len(cols) > 3:
                     tenthRanked = [cols[1], cols[2], cols[3], cols[4], cols[5], cols[6]]
@@ -71,12 +73,35 @@ class WebScraper:
                         tempWBO.append(tenthRanked[5])
                         WBO.append(tempWBO)
         
-        return [TBRB, RING, WBA, WBC, IBF, WBO]
+        return [TBRB, RING, WBA, WBC, IBF, WBO, colsHtml]
 
+    @staticmethod
+    def getDistinctNames(rankings):
+        namesSet = set()
+        namesList = []
+        counter = 0
+        for company in rankings:
+            if counter == 6: break
+            counter += 1
+            for division in company:
+                for name in division:
+                    if '(I)' in name:
+                        continue
+                    namesSet.add(name)
+                            
+        namesList = list(namesSet)
+        return namesList        
 
-
-
-
+    @staticmethod
+    def getWikiLinks(tableRowsHtml, names):
+        linksSet = set()
+        for row in tableRowsHtml:
+            for element in row:
+                for link in element.find_all('a', href=True):
+                    if link.get_text() in names and 'redlink=1' not in link['href']:
+                        linksSet.add(link['href'])
+        return list(linksSet)
+        
 """ URL = 'https://en.wikipedia.org/wiki/List_of_current_boxing_rankings'
     page = requests.get(URL)
 
