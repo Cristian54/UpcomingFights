@@ -2,4 +2,5 @@ from webscrapper import WebScrapper
 
 rankings = WebScrapper.getRankings()
 distinctNames = WebScrapper.getDistinctNames(rankings)
-fightersWikiLinks = WebScrapper.getWikiLinks(rankings[6], distinctNames)
+wikiLinksAndNames = WebScrapper.getWikiLinks(rankings[6], distinctNames)
+WebScrapper.getUpcomingFights(wikiLinksAndNames[0], wikiLinksAndNames[1])

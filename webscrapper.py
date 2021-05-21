@@ -1,13 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
+import re
+from datetime import *
 
 class WebScrapper: 
     @staticmethod
     def getRankings():
         URL = 'https://en.wikipedia.org/wiki/List_of_current_boxing_rankings'
         page = requests.get(URL)
-
         soup = BeautifulSoup(page.content, 'html.parser')
+        
         classContent = soup.find(id='mw-content-text')
         tables = classContent.find_all('table', attrs={'class':'wikitable'})
         
@@ -100,7 +102,66 @@ class WebScrapper:
                 for link in element.find_all('a', href=True):
                     if link.get_text() in names and 'redlink=1' not in link['href']:
                         linksSet.add(link['href'])
-        return list(linksSet)
+                    elif link.get_text() in names and 'redlink=1' in link['href']:
+                        names.remove(link.get_text())
+        return [list(linksSet), names] 
+    
+    @staticmethod
+    def getUpcomingFights(fightersLinks, names):
+        URL = 'https://en.wikipedia.org/wiki/Michael_Hunter_(American_boxer)'
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, 'html.parser')
+        
+        classContent = soup.find(id='mw-content-text')
+        tables = classContent.find_all('table', attrs={'class':'wikitable'})
+        
+        fightsTable = tables[1].find('tbody')
+        row = fightsTable.find_all('tr')[1] 
+        fightDate = row.find_all('td')[6]
+        fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%b %d, %Y")
+        
+        if datetime.today() <= fightDateFormatted: 
+            #fightInfo = [date, opponents name, opp record, location] 
+            fightInfo = [fightDate]
+            
+            nameHeading = soup.find('h1', id='firstHeading')
+            nameText = nameHeading.get_text()
+            if ' (American boxer)' in nameText:
+                nameText = nameText.replace(' (American boxer)', '')
+            elif ' (Mexican boxer)' in nameText:
+                nameText = nameText.replace(' (Mexican boxer)', '')
+            elif ' (boxer)' in nameText:
+                nameText = nameText.replace(' (boxer)', '')
+            
+            recordTableBody = tables[0].find('tbody')
+            rows = recordTableBody.find_all('tr')
+            
+            #[totalFights, wins, losses, KO wins, draws (if any), name?], this will be a list of lists
+            record = []
+            
+            #rows[0] = tot fights, wins and losses. rows[1] = wins & losses by ko. rows[3] = draws (doesn't exist if fighter has no draws) 
+            row = rows[0].find_all('td')
+            tempString = ''
+            for ele in row:
+                tempString += ele.text.strip()
+            temp = re.findall(r'\d+', tempString)
+            res = list(map(int, temp)) 
+            
+            for item in res:
+                record.append(item)  
+                
+            row = rows[1].find_all('td')
+            record.append(row[1].text.strip())
+            
+            if len(rows) == 4:
+                row = rows[3].find_all('td')
+                record.append(row[1].text.strip())
+                
+            record.append(nameText)
+            
+            #return [record, fightInfo]
+        else:
+            return False
         
 """ URL = 'https://en.wikipedia.org/wiki/List_of_current_boxing_rankings'
     page = requests.get(URL)
