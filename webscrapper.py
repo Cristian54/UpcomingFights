@@ -108,86 +108,105 @@ class WebScrapper:
     
     @staticmethod
     def getUpcomingFights(fightersLinks, names):
-        URL = 'https://en.wikipedia.org/wiki/Michael_Hunter_(American_boxer)'
-        page = requests.get(URL)
-        soup = BeautifulSoup(page.content, 'html.parser')
+        #fightsInfo[[record, fightInfo], [another fight], [], []]
+        fightsInfo = []
         
-        classContent = soup.find(id='mw-content-text')
-        tables = classContent.find_all('table', attrs={'class':'wikitable'})
-        
-        fightsTable = tables[1].find('tbody')
-        row = fightsTable.find_all('tr')[1] 
-        fightDate = row.find_all('td')[6]
-        fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%b %d, %Y")
-        
-        if datetime.today() <= fightDateFormatted: 
-            #fightInfo = [date, opponents name, opp record, location] 
-            fightInfo = [fightDate]
-            
-            nameHeading = soup.find('h1', id='firstHeading')
-            nameText = nameHeading.get_text()
-            if ' (American boxer)' in nameText:
-                nameText = nameText.replace(' (American boxer)', '')
-            elif ' (Mexican boxer)' in nameText:
-                nameText = nameText.replace(' (Mexican boxer)', '')
-            elif ' (boxer)' in nameText:
-                nameText = nameText.replace(' (boxer)', '')
-            
-            recordTableBody = tables[0].find('tbody')
-            rows = recordTableBody.find_all('tr')
-            
-            #[totalFights, wins, losses, KO wins, draws (if any), name?], this will be a list of lists
-            record = []
-            
-            #rows[0] = tot fights, wins and losses. rows[1] = wins & losses by ko. rows[3] = draws (doesn't exist if fighter has no draws) 
-            row = rows[0].find_all('td')
-            tempString = ''
-            for ele in row:
-                tempString += ele.text.strip()
-            temp = re.findall(r'\d+', tempString)
-            res = list(map(int, temp)) 
-            
-            for item in res:
-                record.append(item)  
+        for link in fightersLinks:
+            print(link)
+            URL = 'https://en.wikipedia.org' + link
+            print(URL)
+            page = requests.get(URL)
+            soup = BeautifulSoup(page.content, 'html.parser')
                 
-            row = rows[1].find_all('td')
-            record.append(row[1].text.strip())
+            classContent = soup.find(id='mw-content-text')
+            tables = classContent.find_all('table', attrs={'class':'wikitable'})
             
-            if len(rows) == 4:
-                row = rows[3].find_all('td')
+            if len(tables) < 2 or len(tables) > 3: 
+                fightersLinks.remove(link)
+                continue
+                
+            fightsTable = tables[1].find('tbody')
+            rowZero = fightsTable.find_all('tr')[0]
+            rowOne = fightsTable.find_all('tr')[1] 
+            
+            if len(rowZero.find_all('th')) == 8:
+                fightDate = rowOne.find_all('td')[5]
+            else: fightDate = rowOne.find_all('td')[6]
+            
+            if fightDate.text.strip().startswith(('2016', '2017', '2018', '2019', '2020', 'TBA')):
+                fightersLinks.remove(link)
+                continue
+            
+            #Formats so far: (Apr 12, 2020) (12 Apr 2020) (12 April 2020) (2021-05-22)
+            months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+            if fightDate.text.strip().startswith(('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')):
+                fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%b %d, %Y")
+            elif any(month in fightDate.text.strip() for month in months):
+                fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %B %Y")
+            elif fightDate.text.strip().startswith('2021'):
+                fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%Y-%m-%d")
+            else:
+                fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %b %Y")
+                
+            if datetime.today() <= fightDateFormatted + timedelta(days=1):
+                opponentName = rowOne.find_all('td')[3]
+                oppLinks = opponentName.find_all('a', href=True)
+                for oppLink in oppLinks:
+                    if opponentName.text.strip() in names and oppLink['href'] in fightersLinks:
+                        fightersLinks.remove(oppLink['href'])
+                    
+                oppRecord = rowOne.find_all('td')[2]
+                fightLocation = rowOne.find_all('td')[7]
+                
+                #fightInfo = [date, opponents name, opp record, location] 
+                fightInfo = [fightDate.text.strip(), opponentName.text.strip(), oppRecord.text.strip(), fightLocation.text.strip()]
+                
+                nameHeading = soup.find('h1', id='firstHeading')
+                nameText = nameHeading.get_text()
+                if ' (American boxer)' in nameText:
+                    nameText = nameText.replace(' (American boxer)', '')
+                elif ' (Mexican boxer)' in nameText:
+                    nameText = nameText.replace(' (Mexican boxer)', '')
+                elif ' (boxer)' in nameText:
+                        nameText = nameText.replace(' (boxer)', '')
+                    
+                recordTableBody = tables[0].find('tbody')
+                rows = recordTableBody.find_all('tr')
+                    
+                #[totalFights, wins, losses, KO wins, draws (if any), name]
+                record = []
+                    
+                #rows[0] = tot fights, wins and losses. rows[1] = wins & losses by ko. rows[3] = draws (doesn't exist if fighter has no draws) 
+                row = rows[0].find_all('td')
+                tempString = ''
+                for ele in row:
+                    tempString += ele.text.strip()
+                temp = re.findall(r'\d+', tempString)
+                res = list(map(int, temp)) 
+                    
+                for item in res:
+                    record.append(item)  
+                    
+                row = rows[1].find_all('td')
                 record.append(row[1].text.strip())
+                    
+                if len(rows) == 4:
+                    row = rows[3].find_all('td')
+                    record.append(row[1].text.strip())
+                    
+                record.append(nameText)
+                    
+                temp = []
+                temp.append(record)
+                temp.append(fightInfo)
+                fightsInfo.append(temp)
                 
-            record.append(nameText)
-            
-            #return [record, fightInfo]
-        else:
-            return False
-        
-""" URL = 'https://en.wikipedia.org/wiki/List_of_current_boxing_rankings'
-    page = requests.get(URL)
-
-    soup = BeautifulSoup(page.content, 'html.parser')
-    classContent = soup.find(id='mw-content-text')
-
-    weightClassesHeaders = classContent.find_all("h3")
-    weightClasses = []
-
-    for header in weightClassesHeaders:
-        strModified = header.get_text().replace('[edit]', '')
-        weightClasses.append(strModified)
-        #print(strModified, "\n")
-        
-    #print(weightClasses)
-
-    tables = classContent.find_all('table', attrs={'class':'wikitable'}) 
-    table = tables[1]
-    table_body = table.find('tbody')
-    rows = table_body.find_all('tr')
-    tableHeaders = rows[0].find_all('th')
-
-    rankingCompany = []
-    for header in tableHeaders:
-        #print(header.text.strip(), "\n")
-        rankingCompany.append(header.text.strip())
-
-    #print(rankingBodies) """
+                print('---------FIGHT-------')
+                print(temp)
+                print('---------FIGHT-------')
+                    
+            else:
+                fightersLinks.remove(link)
+                continue
+         
+        return fightsInfo 
