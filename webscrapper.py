@@ -3,12 +3,12 @@ from bs4 import BeautifulSoup
 import re
 from datetime import *
 
-class WebScrapper: 
+class WebScraper: 
     @staticmethod
     def getRankings():
         URL = 'https://en.wikipedia.org/wiki/List_of_current_boxing_rankings'
         page = requests.get(URL)
-        soup = BeautifulSoup(page.content, 'html.parser')
+        soup = BeautifulSoup(page.content, 'lxml')
         
         classContent = soup.find(id='mw-content-text')
         tables = classContent.find_all('table', attrs={'class':'wikitable'})
@@ -19,6 +19,7 @@ class WebScrapper:
         WBC = [] 
         IBF = []
         WBO = []
+        BOXREC = []
         colsHtml = []
         
         for table in tables:
@@ -31,6 +32,7 @@ class WebScrapper:
             tempWBC = []
             tempIBF = []
             tempWBO = []
+            tempBR = []
             counter = 0
             
             for row in rows:
@@ -38,7 +40,7 @@ class WebScrapper:
                 colsHtml.append(cols)
                 cols = [ele.text.strip() for ele in cols]
                 if len(cols) > 3:
-                    tenthRanked = [cols[1], cols[2], cols[3], cols[4], cols[5], cols[6]]
+                    tenthRanked = [cols[1], cols[2], cols[3], cols[4], cols[5], cols[6], cols[0]]
                     
                     if counter < 10:
                         if '(S)' in cols[3]:
@@ -46,7 +48,8 @@ class WebScrapper:
                             tempWBA.append(param[0])
                         else: 
                             tempWBA.append(cols[3])
-                            
+                        
+                        tempBR.append(cols[0])
                         tempTBRB.append(cols[1])
                         tempRING.append(cols[2])
                         tempWBC.append(cols[4])
@@ -74,21 +77,19 @@ class WebScrapper:
                         
                         tempWBO.append(tenthRanked[5])
                         WBO.append(tempWBO)
+                        
+                        tempBR.append(tenthRanked[6])
+                        BOXREC.append(tempBR)
         
-        return [TBRB, RING, WBA, WBC, IBF, WBO, colsHtml]
+        return [TBRB, RING, WBA, WBC, IBF, WBO, colsHtml, BOXREC]
 
     @staticmethod
     def getDistinctNames(rankings):
         namesSet = set()
         namesList = []
-        counter = 0
         for company in rankings:
-            if counter == 6: break
-            counter += 1
             for division in company:
                 for name in division:
-                    if '(I)' in name:
-                        continue
                     namesSet.add(name)
                             
         namesList = list(namesSet)
@@ -102,38 +103,53 @@ class WebScrapper:
                 for link in element.find_all('a', href=True):
                     if link.get_text() in names and 'redlink=1' not in link['href']:
                         linksSet.add(link['href'])
-                    elif link.get_text() in names and 'redlink=1' in link['href']:
-                        names.remove(link.get_text())
-        return [list(linksSet), names] 
+                    """ elif link.get_text() in names and 'redlink=1' in link['href']:
+                        names.remove(link.get_text()) """
+        return list(linksSet) 
     
     @staticmethod
-    def getUpcomingFights(fightersLinks, names):
+    def getUpcomingFights(fightersLinks):
         #fightsInfo[[record, fightInfo], [another fight], [], []]
         fightsInfo = []
         
         for link in fightersLinks:
-            print(link)
             URL = 'https://en.wikipedia.org' + link
-            print(URL)
+            #print(URL)
             page = requests.get(URL)
-            soup = BeautifulSoup(page.content, 'html.parser')
+            soup = BeautifulSoup(page.content, 'lxml')
                 
             classContent = soup.find(id='mw-content-text')
             tables = classContent.find_all('table', attrs={'class':'wikitable'})
             
-            if len(tables) < 2 or len(tables) > 3: 
+            if len(tables) < 1:
                 fightersLinks.remove(link)
                 continue
-                
-            fightsTable = tables[1].find('tbody')
-            rowZero = fightsTable.find_all('tr')[0]
-            rowOne = fightsTable.find_all('tr')[1] 
+            
+            firstTable = tables[0].find('tbody')
+            firstRow = firstTable.find_all('tr')[0]
+            
+            if link == '/wiki/Dillian_Whyte': 
+                recordTableBody = tables[2].find('tbody')
+                fightsTable = tables[3].find('tbody')
+                rowZero = fightsTable.find_all('tr')[0]
+                rowOne = fightsTable.find_all('tr')[1]
+            elif len(firstRow) == 6:
+                recordTableBody = firstTable
+                fightsTable = tables[1].find('tbody')
+                rowZero = fightsTable.find_all('tr')[0]
+                rowOne = fightsTable.find_all('tr')[1]
+            elif len(firstRow) > 6 or len(firstRow) < 6:
+                recordTableBody = tables[1].find('tbody')
+                fightsTable = tables[2].find('tbody')
+                rowZero = fightsTable.find_all('tr')[0]
+                rowOne = fightsTable.find_all('tr')[1]
+            
             
             if len(rowZero.find_all('th')) == 8:
                 fightDate = rowOne.find_all('td')[5]
             else: fightDate = rowOne.find_all('td')[6]
             
-            if fightDate.text.strip().startswith(('2016', '2017', '2018', '2019', '2020', 'TBA')):
+            if fightDate.text.strip().startswith(('2018', '2019', '2020', 'TBA')):
                 fightersLinks.remove(link)
                 continue
             
@@ -152,7 +168,7 @@ class WebScrapper:
                 opponentName = rowOne.find_all('td')[3]
                 oppLinks = opponentName.find_all('a', href=True)
                 for oppLink in oppLinks:
-                    if opponentName.text.strip() in names and oppLink['href'] in fightersLinks:
+                    if oppLink['href'] in fightersLinks:
                         fightersLinks.remove(oppLink['href'])
                     
                 oppRecord = rowOne.find_all('td')[2]
@@ -165,12 +181,11 @@ class WebScrapper:
                 nameText = nameHeading.get_text()
                 if ' (American boxer)' in nameText:
                     nameText = nameText.replace(' (American boxer)', '')
+                elif ' (boxer)' in nameText:
+                    nameText = nameText.replace(' (boxer)', '')
                 elif ' (Mexican boxer)' in nameText:
                     nameText = nameText.replace(' (Mexican boxer)', '')
-                elif ' (boxer)' in nameText:
-                        nameText = nameText.replace(' (boxer)', '')
                     
-                recordTableBody = tables[0].find('tbody')
                 rows = recordTableBody.find_all('tr')
                     
                 #[totalFights, wins, losses, KO wins, draws (if any), name]
@@ -201,9 +216,9 @@ class WebScrapper:
                 temp.append(fightInfo)
                 fightsInfo.append(temp)
                 
-                print('---------FIGHT-------')
+                """ print('---------FIGHT-------')
                 print(temp)
-                print('---------FIGHT-------')
+                print('---------FIGHT-------') """
                     
             else:
                 fightersLinks.remove(link)
