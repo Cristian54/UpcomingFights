@@ -2,23 +2,51 @@ from webscrapper import WebScraper
 import time
 
 rankings = WebScraper.getRankings()
-rankingss = [rankings[0], rankings[1], rankings[7]]
-distinctNames = WebScraper.getDistinctNames(rankingss)
+counter = 0
+for company in rankings:
+    if counter == 6: continue
+    counter += 1
+    print(company, "\n")
+rankingss = [rankings[1], rankings[7]]
+""" distinctNames = WebScraper.getDistinctNames(rankingss)
+
 if 'Alexei Papin' in distinctNames: distinctNames.remove('Alexei Papin')
 if 'Manny Pacquiao' in distinctNames: distinctNames.remove('Manny Pacquiao')
 if 'Mateusz Masternak' in distinctNames: distinctNames.remove('Mateusz Masternak')
 
-#[fightersLinks, namesUpdated] = WebScraper.getWikiLinks(rankings[6], distinctNames)
 fightersLinks = WebScraper.getWikiLinks(rankings[6], distinctNames)
-#for link in fightersLinks: print(link)
 
 start = time.time()
 fights = WebScraper.getUpcomingFights(fightersLinks)
 end = time.time()
-print(end - start)
+print(end - start) """
+
+""" 
+for link in fightersLinks:
+    fight = WebScraper.getUpcomingFightsV2(link, fightersLinks)
+    if fight:
+        fights.append(fight)
+        oppLink = fight[1][4]
+        if oppLink in fightersLinks: fightersLinks.remove(oppLink)
+    else: continue """
+
+""" fightsNames = [] 
+for f in fights:
+    if len(f[0]) == 5:
+        if f[0][4] not in fightsNames and f[1][1] not in fightsNames:
+            fightsNames.append(f[0][4])
+            fightsNames.append(f[1][1])
+        else: fights.remove(f) 
+    else: 
+        if f[0][5] not in fightsNames and f[1][1] not in fightsNames:
+            fightsNames.append(f[0][5])
+            fightsNames.append(f[1][1])
+        else: fights.remove(f)
+    
+#print(fightsNames)
 
 for f in fights: print(f)
-print(len(fights))
+print(len(fights)) """
 
 
 """ import requests

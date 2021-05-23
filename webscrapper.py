@@ -86,7 +86,6 @@ class WebScraper:
     @staticmethod
     def getDistinctNames(rankings):
         namesSet = set()
-        namesList = []
         for company in rankings:
             for division in company:
                 for name in division:
@@ -103,8 +102,6 @@ class WebScraper:
                 for link in element.find_all('a', href=True):
                     if link.get_text() in names and 'redlink=1' not in link['href']:
                         linksSet.add(link['href'])
-                    """ elif link.get_text() in names and 'redlink=1' in link['href']:
-                        names.remove(link.get_text()) """
         return list(linksSet) 
     
     @staticmethod
@@ -122,7 +119,6 @@ class WebScraper:
             tables = classContent.find_all('table', attrs={'class':'wikitable'})
             
             if len(tables) < 1:
-                fightersLinks.remove(link)
                 continue
             
             firstTable = tables[0].find('tbody')
@@ -133,11 +129,13 @@ class WebScraper:
                 fightsTable = tables[3].find('tbody')
                 rowZero = fightsTable.find_all('tr')[0]
                 rowOne = fightsTable.find_all('tr')[1]
+                
             elif len(firstRow) == 6:
                 recordTableBody = firstTable
                 fightsTable = tables[1].find('tbody')
                 rowZero = fightsTable.find_all('tr')[0]
                 rowOne = fightsTable.find_all('tr')[1]
+                
             elif len(firstRow) > 6 or len(firstRow) < 6:
                 recordTableBody = tables[1].find('tbody')
                 fightsTable = tables[2].find('tbody')
@@ -221,7 +219,119 @@ class WebScraper:
                 print('---------FIGHT-------') """
                     
             else:
-                fightersLinks.remove(link)
                 continue
          
         return fightsInfo 
+
+
+    @staticmethod
+    def getUpcomingFightsV2(link, fightersLinks):
+        #fightsInfo[[record, fightInfo], [another fight], [], []]
+        #fightsInfo = []
+
+        URL = 'https://en.wikipedia.org' + link
+        #print(URL)
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, 'lxml')
+            
+        classContent = soup.find(id='mw-content-text')
+        tables = classContent.find_all('table', attrs={'class':'wikitable'})
+        
+        if len(tables) < 1:
+            return []
+        
+        firstTable = tables[0].find('tbody')
+        firstRow = firstTable.find_all('tr')[0]
+        
+        if link == '/wiki/Dillian_Whyte': 
+            recordTableBody = tables[2].find('tbody')
+            fightsTable = tables[3].find('tbody')
+            rowZero = fightsTable.find_all('tr')[0]
+            rowOne = fightsTable.find_all('tr')[1]
+            
+        elif len(firstRow) == 6:
+            recordTableBody = firstTable
+            fightsTable = tables[1].find('tbody')
+            rowZero = fightsTable.find_all('tr')[0]
+            rowOne = fightsTable.find_all('tr')[1]
+            
+        elif len(firstRow) > 6 or len(firstRow) < 6:
+            recordTableBody = tables[1].find('tbody')
+            fightsTable = tables[2].find('tbody')
+            rowZero = fightsTable.find_all('tr')[0]
+            rowOne = fightsTable.find_all('tr')[1]
+        
+        
+        if len(rowZero.find_all('th')) == 8:
+            fightDate = rowOne.find_all('td')[5]
+        else: fightDate = rowOne.find_all('td')[6]
+        
+        if fightDate.text.strip().startswith(('2018', '2019', '2020', 'TBA')):
+            return []
+        
+        #Formats so far: (Apr 12, 2020) (12 Apr 2020) (12 April 2020) (2021-05-22)
+        months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        if fightDate.text.strip().startswith(('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')):
+            fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%b %d, %Y")
+        elif any(month in fightDate.text.strip() for month in months):
+            fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %B %Y")
+        elif fightDate.text.strip().startswith('2021'):
+            fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%Y-%m-%d")
+        else:
+            fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %b %Y")
+            
+        if datetime.today() <= fightDateFormatted + timedelta(days=1):
+            opponentName = rowOne.find_all('td')[3]
+            oppLinks = opponentName.find_all('a', href=True)
+            oppL = ''
+            for oppLink in oppLinks:
+                if oppLink['href'] in fightersLinks:
+                    oppL = oppLink['href']
+                
+            oppRecord = rowOne.find_all('td')[2]
+            fightLocation = rowOne.find_all('td')[7]
+            
+            #fightInfo = [date, opponents name, opp record, location] 
+            fightInfo = [fightDate.text.strip(), opponentName.text.strip(), oppRecord.text.strip(), fightLocation.text.strip(), oppL]
+            
+            nameHeading = soup.find('h1', id='firstHeading')
+            nameText = nameHeading.get_text()
+            if ' (American boxer)' in nameText:
+                nameText = nameText.replace(' (American boxer)', '')
+            elif ' (boxer)' in nameText:
+                nameText = nameText.replace(' (boxer)', '')
+            elif ' (Mexican boxer)' in nameText:
+                nameText = nameText.replace(' (Mexican boxer)', '')
+                
+            rows = recordTableBody.find_all('tr')
+                
+            #[totalFights, wins, losses, KO wins, draws (if any), name]
+            record = []
+                
+            #rows[0] = tot fights, wins and losses. rows[1] = wins & losses by ko. rows[3] = draws (doesn't exist if fighter has no draws) 
+            row = rows[0].find_all('td')
+            tempString = ''
+            for ele in row:
+                tempString += ele.text.strip()
+            temp = re.findall(r'\d+', tempString)
+            res = list(map(int, temp)) 
+                
+            for item in res:
+                record.append(item)  
+                
+            row = rows[1].find_all('td')
+            record.append(row[1].text.strip())
+                
+            if len(rows) == 4:
+                row = rows[3].find_all('td')
+                record.append(row[1].text.strip())
+                
+            record.append(nameText)
+                
+            temp = []
+            temp.append(record)
+            temp.append(fightInfo)
+            return temp
+                
+        else:
+            return []
