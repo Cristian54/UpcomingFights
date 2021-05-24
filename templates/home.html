@@ -18,15 +18,26 @@
     </div>
 
     {% for fight in fights%}
-      <p>{{fight[0]}} vs {{fight[1]}}</p>
+      <div class="fight">
+        {{fight[0]}}
+        <br>
+        {{fight[1]}} vs {{fight[2]}}
+      </div>
     {% endfor %}
 
   </body>
 
   <style>
       body {
-          background-color: #ffffff;
-          color: rgb(0, 0, 0)
+        background: linear-gradient(-90deg, #a43931, #1d4350);
+      }
+      .fight {
+        background-color: white;
+        border: 10px solid rgb(10, 44, 10);
+        padding: 20px;
+        margin: 20px;
+        text-align: center;
+        font-size: 20px;
       }
       .navbar {
         overflow: hidden;

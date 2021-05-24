@@ -24,28 +24,13 @@ class Rankings(db.Model):
 
 @app.route('/')
 def home_page(): 
-    """ rankings = WebScrapper.getRankings()
-    distinctNames = WebScrapper.getDistinctNames(rankings)
-    wikiLinksAndNames = WebScrapper.getWikiLinks(rankings[6], distinctNames)
-
-    wikiLinksAndNames[0].remove('/wiki/Alexei_Papin')
-    wikiLinksAndNames[0].remove('/wiki/Hugo_Centeno_Jr.')
-    wikiLinksAndNames[0].remove('/wiki/Denys_Berinchyk')
-    wikiLinksAndNames[0].remove('/wiki/Tervel_Pulev')
-                
-    fights = WebScrapper.getUpcomingFights(wikiLinksAndNames[0], wikiLinksAndNames[1]) """
-    
-    test = [['Canelo', 'Plant'], ['Fury', 'Joshua'], ['Spence', 'Pac']]
+    #[[Date, FighterA, FighterB, RecordA, recordB]]
+    test = [['Sept 18', 'Canelo', 'Plant', '55-1', '21-0'], ['Dec', 'Fury', 'Joshua', '30-0', '22-1'], ['Aug', 'Spence', 'Pac', '29-0', '67-7']]
     return render_template('home.html', fights=test)
 
 @app.route('/rankings')
 def rankings():
-    TBRB = []
-    RING = []
-    WBA = []
-    WBC = [] 
-    IBF = []
-    WBO = []
+    TBRB, RING, WBA, WBC, IBF, WBO = [], [], [], [], [], []
     
     temp = []
     ranks = ['C', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

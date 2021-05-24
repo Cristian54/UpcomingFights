@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import re
 from datetime import *
 
 class WebScraper: 
@@ -13,26 +12,13 @@ class WebScraper:
         classContent = soup.find(id='mw-content-text')
         tables = classContent.find_all('table', attrs={'class':'wikitable'})
         
-        TBRB = []
-        RING = []
-        WBA = []
-        WBC = [] 
-        IBF = []
-        WBO = []
-        BOXREC = []
-        colsHtml = []
-        
+        TBRB, RING, WBA, WBC, IBF, WBO, BOXREC, colsHtml = [], [], [], [], [], [], [], []
+
         for table in tables:
             table_body = table.find('tbody')
             rows = table_body.find_all('tr')
             
-            tempTBRB = []
-            tempRING = []
-            tempWBA = []
-            tempWBC = []
-            tempIBF = []
-            tempWBO = []
-            tempBR = []
+            tempTBRB, tempRING, tempWBA, tempWBC, tempIBF, tempWBO, tempBR = [], [], [], [], [], [], []
             counter = 0
             
             for row in rows:
@@ -103,13 +89,70 @@ class WebScraper:
                     if link.get_text() in names and 'redlink=1' not in link['href']:
                         linksSet.add(link['href'])
         return list(linksSet) 
-    
+       
+    @staticmethod
+    def getOpponentsInfo(link):
+        fighter_info = [] #[Name, Total fights, wins, KOs, losses, nickname, link, draws]
+        totalFights, wins, KOs, losses, nickname, draws = '', '', '', '', '', ''
+        
+        URL = 'https://en.wikipedia.org' + link
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, 'lxml') 
+        
+        nameHeading = soup.find('h1', id='firstHeading')
+        nameText = nameHeading.get_text()
+        if ' (American boxer)' in nameText:
+            nameText = nameText.replace(' (American boxer)', '')
+        elif ' (boxer)' in nameText:
+            nameText = nameText.replace(' (boxer)', '')
+        elif ' (Mexican boxer)' in nameText:
+            nameText = nameText.replace(' (Mexican boxer)', '')
+            
+        classContent = soup.find(id='mw-content-text')
+        tables = classContent.find_all('table', attrs={'class':'wikitable'})
+            
+        if len(tables) <= 1:
+            fighter_info.extend([nameText, "Empty wiki page"])
+            return fighter_info
+        
+        fighterInfoTable = classContent.find('table', attrs={'class':'infobox vcard'})
+        tableBody = fighterInfoTable.find('tbody')
+        ths = tableBody.find_all('th', attrs={'class':'infobox-label'})
+        
+        for th in ths: 
+            if th.text.strip() == 'Total fights':
+                td = th.find_next('td')
+                totalFights = td.text.strip()
+            elif th.text.strip() == 'Wins':
+                td = th.find_next('td')
+                wins = td.text.strip()
+            elif th.text.strip() == 'Wins by KO':
+                td = th.find_next('td')
+                KOs = td.text.strip()
+            elif th.text.strip() == 'Losses':
+                td = th.find_next('td')
+                losses = td.text.strip()
+            elif th.text.strip() == 'Nickname(s)':
+                td = th.find_next('td')
+                nickname = td.text.strip()
+            elif th.text.strip() == 'Draws':
+                td = th.find_next('td')
+                nickname = td.text.strip()
+
+        if draws != '': fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, draws])
+        else: fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, '0'])
+            
+        return fighter_info
+        
     @staticmethod
     def getUpcomingFights(fightersLinks):
-        #fightsInfo[[record, fightInfo], [another fight], [], []]
-        fightsInfo = []
+        fights = [] #[[A, B], [A, B]]
         
         for link in fightersLinks:
+            fighterA_Info = [] #[Name, Total fights, wins, KOs, losses, nickname, link, draws]
+            fighterB_Info = [] 
+            totalFights, wins, KOs, losses, nickname, draws = '', '', '', '', '', ''
+            
             URL = 'https://en.wikipedia.org' + link
             #print(URL)
             page = requests.get(URL)
@@ -118,26 +161,23 @@ class WebScraper:
             classContent = soup.find(id='mw-content-text')
             tables = classContent.find_all('table', attrs={'class':'wikitable'})
             
-            if len(tables) < 1:
+            if len(tables) <= 1:
                 continue
             
             firstTable = tables[0].find('tbody')
             firstRow = firstTable.find_all('tr')[0]
             
             if link == '/wiki/Dillian_Whyte': 
-                recordTableBody = tables[2].find('tbody')
                 fightsTable = tables[3].find('tbody')
                 rowZero = fightsTable.find_all('tr')[0]
                 rowOne = fightsTable.find_all('tr')[1]
                 
             elif len(firstRow) == 6:
-                recordTableBody = firstTable
                 fightsTable = tables[1].find('tbody')
                 rowZero = fightsTable.find_all('tr')[0]
                 rowOne = fightsTable.find_all('tr')[1]
                 
             elif len(firstRow) > 6 or len(firstRow) < 6:
-                recordTableBody = tables[1].find('tbody')
                 fightsTable = tables[2].find('tbody')
                 rowZero = fightsTable.find_all('tr')[0]
                 rowOne = fightsTable.find_all('tr')[1]
@@ -164,16 +204,17 @@ class WebScraper:
                 
             if datetime.today() <= fightDateFormatted + timedelta(days=1):
                 opponentName = rowOne.find_all('td')[3]
+                firstName = opponentName.text.strip().split(' ')[0]
                 oppLinks = opponentName.find_all('a', href=True)
+                
                 for oppLink in oppLinks:
                     if oppLink['href'] in fightersLinks:
                         fightersLinks.remove(oppLink['href'])
-                    
-                oppRecord = rowOne.find_all('td')[2]
-                fightLocation = rowOne.find_all('td')[7]
-                
-                #fightInfo = [date, opponents name, opp record, location] 
-                fightInfo = [fightDate.text.strip(), opponentName.text.strip(), oppRecord.text.strip(), fightLocation.text.strip()]
+                    if firstName in oppLink['href']:
+                        fighterB_Info = WebScraper.getOpponentsInfo(oppLink['href'])
+                        #print(oppLink['href'])
+
+                if not fighterB_Info: fighterB_Info.extend([opponentName.text.strip(), "No wiki page for opponent"])
                 
                 nameHeading = soup.find('h1', id='firstHeading')
                 nameText = nameHeading.get_text()
@@ -184,154 +225,41 @@ class WebScraper:
                 elif ' (Mexican boxer)' in nameText:
                     nameText = nameText.replace(' (Mexican boxer)', '')
                     
-                rows = recordTableBody.find_all('tr')
-                    
-                #[totalFights, wins, losses, KO wins, draws (if any), name]
-                record = []
-                    
-                #rows[0] = tot fights, wins and losses. rows[1] = wins & losses by ko. rows[3] = draws (doesn't exist if fighter has no draws) 
-                row = rows[0].find_all('td')
-                tempString = ''
-                for ele in row:
-                    tempString += ele.text.strip()
-                temp = re.findall(r'\d+', tempString)
-                res = list(map(int, temp)) 
-                    
-                for item in res:
-                    record.append(item)  
-                    
-                row = rows[1].find_all('td')
-                record.append(row[1].text.strip())
-                    
-                if len(rows) == 4:
-                    row = rows[3].find_all('td')
-                    record.append(row[1].text.strip())
-                    
-                record.append(nameText)
-                    
+                fighterInfoTable = classContent.find('table', attrs={'class':'infobox vcard'})
+                tableBody = fighterInfoTable.find('tbody')
+                ths = tableBody.find_all('th', attrs={'class':'infobox-label'})
+                
+                for th in ths: 
+                    if th.text.strip() == 'Total fights':
+                        td = th.find_next('td')
+                        totalFights = td.text.strip()
+                    elif th.text.strip() == 'Wins':
+                        td = th.find_next('td')
+                        wins = td.text.strip()
+                    elif th.text.strip() == 'Wins by KO':
+                        td = th.find_next('td')
+                        KOs = td.text.strip()
+                    elif th.text.strip() == 'Losses':
+                        td = th.find_next('td')
+                        losses = td.text.strip()
+                    elif th.text.strip() == 'Nickname(s)':
+                        td = th.find_next('td')
+                        nickname = td.text.strip()
+                    elif th.text.strip() == 'Draws':
+                        td = th.find_next('td')
+                        nickname = td.text.strip()
+
+                if draws != '': fighterA_Info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, draws])
+                else: fighterA_Info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, '0'])
+                
                 temp = []
-                temp.append(record)
-                temp.append(fightInfo)
-                fightsInfo.append(temp)
+                temp.append(fighterA_Info)
+                temp.append(fighterB_Info)
+                fights.append(temp)
                 
-                """ print('---------FIGHT-------')
-                print(temp)
-                print('---------FIGHT-------') """
-                    
-            else:
+            else: 
                 continue
-         
-        return fightsInfo 
-
-
-    @staticmethod
-    def getUpcomingFightsV2(link, fightersLinks):
-        #fightsInfo[[record, fightInfo], [another fight], [], []]
-        #fightsInfo = []
-
-        URL = 'https://en.wikipedia.org' + link
-        #print(URL)
-        page = requests.get(URL)
-        soup = BeautifulSoup(page.content, 'lxml')
             
-        classContent = soup.find(id='mw-content-text')
-        tables = classContent.find_all('table', attrs={'class':'wikitable'})
-        
-        if len(tables) < 1:
-            return []
-        
-        firstTable = tables[0].find('tbody')
-        firstRow = firstTable.find_all('tr')[0]
-        
-        if link == '/wiki/Dillian_Whyte': 
-            recordTableBody = tables[2].find('tbody')
-            fightsTable = tables[3].find('tbody')
-            rowZero = fightsTable.find_all('tr')[0]
-            rowOne = fightsTable.find_all('tr')[1]
-            
-        elif len(firstRow) == 6:
-            recordTableBody = firstTable
-            fightsTable = tables[1].find('tbody')
-            rowZero = fightsTable.find_all('tr')[0]
-            rowOne = fightsTable.find_all('tr')[1]
-            
-        elif len(firstRow) > 6 or len(firstRow) < 6:
-            recordTableBody = tables[1].find('tbody')
-            fightsTable = tables[2].find('tbody')
-            rowZero = fightsTable.find_all('tr')[0]
-            rowOne = fightsTable.find_all('tr')[1]
-        
-        
-        if len(rowZero.find_all('th')) == 8:
-            fightDate = rowOne.find_all('td')[5]
-        else: fightDate = rowOne.find_all('td')[6]
-        
-        if fightDate.text.strip().startswith(('2018', '2019', '2020', 'TBA')):
-            return []
-        
-        #Formats so far: (Apr 12, 2020) (12 Apr 2020) (12 April 2020) (2021-05-22)
-        months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-        if fightDate.text.strip().startswith(('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')):
-            fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%b %d, %Y")
-        elif any(month in fightDate.text.strip() for month in months):
-            fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %B %Y")
-        elif fightDate.text.strip().startswith('2021'):
-            fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%Y-%m-%d")
-        else:
-            fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %b %Y")
-            
-        if datetime.today() <= fightDateFormatted + timedelta(days=1):
-            opponentName = rowOne.find_all('td')[3]
-            oppLinks = opponentName.find_all('a', href=True)
-            oppL = ''
-            for oppLink in oppLinks:
-                if oppLink['href'] in fightersLinks:
-                    oppL = oppLink['href']
+        return fights
                 
-            oppRecord = rowOne.find_all('td')[2]
-            fightLocation = rowOne.find_all('td')[7]
-            
-            #fightInfo = [date, opponents name, opp record, location] 
-            fightInfo = [fightDate.text.strip(), opponentName.text.strip(), oppRecord.text.strip(), fightLocation.text.strip(), oppL]
-            
-            nameHeading = soup.find('h1', id='firstHeading')
-            nameText = nameHeading.get_text()
-            if ' (American boxer)' in nameText:
-                nameText = nameText.replace(' (American boxer)', '')
-            elif ' (boxer)' in nameText:
-                nameText = nameText.replace(' (boxer)', '')
-            elif ' (Mexican boxer)' in nameText:
-                nameText = nameText.replace(' (Mexican boxer)', '')
                 
-            rows = recordTableBody.find_all('tr')
-                
-            #[totalFights, wins, losses, KO wins, draws (if any), name]
-            record = []
-                
-            #rows[0] = tot fights, wins and losses. rows[1] = wins & losses by ko. rows[3] = draws (doesn't exist if fighter has no draws) 
-            row = rows[0].find_all('td')
-            tempString = ''
-            for ele in row:
-                tempString += ele.text.strip()
-            temp = re.findall(r'\d+', tempString)
-            res = list(map(int, temp)) 
-                
-            for item in res:
-                record.append(item)  
-                
-            row = rows[1].find_all('td')
-            record.append(row[1].text.strip())
-                
-            if len(rows) == 4:
-                row = rows[3].find_all('td')
-                record.append(row[1].text.strip())
-                
-            record.append(nameText)
-                
-            temp = []
-            temp.append(record)
-            temp.append(fightInfo)
-            return temp
-                
-        else:
-            return []

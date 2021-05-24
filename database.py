@@ -25,15 +25,17 @@ def createTables(conn):
         
         sql = """
             CREATE TABLE IF NOT EXISTS Fights (
-                FIGHT_DATE DATE NOT NULL, 
+                FIGHT_DATE TEXT NOT NULL, 
                 FIGHTER_A TEXT NOT NULL, 
                 FIGHTER_B TEXT NOT NULL,
                 A_NICKNAME TEXT NOT NULL, 
                 B_NICKNAME TEXT NOT NULL,
                 A_RECORD TEXT NOT NULL, 
                 B_RECORD TEXT NOT NULL, 
-                A_KOs INT NOT NULL, 
-                B_KOs INT NOT NULL
+                A_KOs TEXT NOT NULL, 
+                B_KOs TEXT NOT NULL, 
+                A_LINK TEXT, 
+                B_LINK TEXT
             ) """
         conn.execute(sql) 
         
@@ -67,9 +69,8 @@ def populateRankings(conn, rankings):
         conn.rollback()
         print(e)
 
-def datbase():
-    database = r"data/WikipediaData.sqlite"
-    
+def database():
+    database = r'data/WikipediaData.sqlite'
     conn = None
     try:
         conn = sqlite3.connect(database)
@@ -81,7 +82,7 @@ def datbase():
         #createTables(conn)
         
         rankings = WebScraper.getRankings()
-        rankingss = [rankings[0], rankings[1], rankings[2], rankings[3], rankings[4], rankings[5]]
-        populateRankings(conn, rankingss)
+        #rankingss = [rankings[0], rankings[1], rankings[2], rankings[3], rankings[4], rankings[5]]
+        #populateRankings(conn, rankingss)
         
-#datbase()
+database()

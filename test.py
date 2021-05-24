@@ -1,72 +1,110 @@
 from webscrapper import WebScraper
-import time
+from datetime import *
 
 rankings = WebScraper.getRankings()
-counter = 0
-for company in rankings:
-    if counter == 6: continue
-    counter += 1
-    print(company, "\n")
 rankingss = [rankings[1], rankings[7]]
-""" distinctNames = WebScraper.getDistinctNames(rankingss)
+distinctNames = WebScraper.getDistinctNames(rankingss)
 
 if 'Alexei Papin' in distinctNames: distinctNames.remove('Alexei Papin')
 if 'Manny Pacquiao' in distinctNames: distinctNames.remove('Manny Pacquiao')
 if 'Mateusz Masternak' in distinctNames: distinctNames.remove('Mateusz Masternak')
+if 'George Kambosos Jr.' in distinctNames: distinctNames.remove('George Kambosos Jr.')
 
 fightersLinks = WebScraper.getWikiLinks(rankings[6], distinctNames)
 
-start = time.time()
 fights = WebScraper.getUpcomingFights(fightersLinks)
-end = time.time()
-print(end - start) """
 
-""" 
-for link in fightersLinks:
-    fight = WebScraper.getUpcomingFightsV2(link, fightersLinks)
-    if fight:
-        fights.append(fight)
-        oppLink = fight[1][4]
-        if oppLink in fightersLinks: fightersLinks.remove(oppLink)
-    else: continue """
-
-""" fightsNames = [] 
-for f in fights:
-    if len(f[0]) == 5:
-        if f[0][4] not in fightsNames and f[1][1] not in fightsNames:
-            fightsNames.append(f[0][4])
-            fightsNames.append(f[1][1])
-        else: fights.remove(f) 
-    else: 
-        if f[0][5] not in fightsNames and f[1][1] not in fightsNames:
-            fightsNames.append(f[0][5])
-            fightsNames.append(f[1][1])
-        else: fights.remove(f)
-    
-#print(fightsNames)
-
-for f in fights: print(f)
-print(len(fights)) """
+for fight in fights: print(fight)
+print(len(fights))
 
 
 """ import requests
 from bs4 import BeautifulSoup
 
 
-URL = 'https://en.wikipedia.org/wiki/Shakur_Stevenson'
+URL = 'https://en.wikipedia.org/wiki/Tyson_Fury'
 page = requests.get(URL)
 soup = BeautifulSoup(page.content, 'lxml')
 classContent = soup.find(id='mw-content-text')
 
 tables = classContent.find_all('table', attrs={'class':'wikitable'})
-print(len(tables))
+            
+#if len(tables) <= 1:
+    #continue
 
-table = tables[1].find('tbody')
-row = table.find_all('tr')[0] #returns 6, which is 2x the number it should be
-print(len(row)) """
+firstTable = tables[0].find('tbody')
+firstRow = firstTable.find_all('tr')[0]
 
+if URL == '/wiki/Dillian_Whyte': 
+    fightsTable = tables[3].find('tbody')
+    rowZero = fightsTable.find_all('tr')[0]
+    rowOne = fightsTable.find_all('tr')[1]
     
-#for table in tables: print(table.get_text())
+elif len(firstRow) == 6:
+    fightsTable = tables[1].find('tbody')
+    rowZero = fightsTable.find_all('tr')[0]
+    rowOne = fightsTable.find_all('tr')[1]
+    
+elif len(firstRow) > 6 or len(firstRow) < 6:
+    fightsTable = tables[2].find('tbody')
+    rowZero = fightsTable.find_all('tr')[0]
+    rowOne = fightsTable.find_all('tr')[1]
+
+
+if len(rowZero.find_all('th')) == 8:
+    fightDate = rowOne.find_all('td')[5]
+else: fightDate = rowOne.find_all('td')[6]
+
+
+#Formats so far: (Apr 12, 2020) (12 Apr 2020) (12 April 2020) (2021-05-22)
+months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+if fightDate.text.strip().startswith(('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')):
+    fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%b %d, %Y")
+elif any(month in fightDate.text.strip() for month in months):
+    fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %B %Y")
+elif fightDate.text.strip().startswith('2021'):
+    fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%Y-%m-%d")
+else:
+    fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %b %Y")
+    
+if datetime.today() <= fightDateFormatted + timedelta(days=1):
+    opponentName = rowOne.find_all('td')[3]
+    firstName = opponentName.text.strip().split(' ')[0]
+    oppLinks = opponentName.find_all('a', href=True)
+    for oppLink in oppLinks:
+        if firstName in oppLink['href']:
+            print(oppLink['href']) """
+
+""" fighterA_Info = [] #[Name, Total fights, wins, KOs, losses, nickname, link, draws]
+totalFights, wins, KOs, losses, nickname, draws = '', '', '', '', '', '' 
+
+fighterInfoTable = classContent.find('table', attrs={'class':'infobox vcard'})
+tableBody = fighterInfoTable.find('tbody')
+ths = tableBody.find_all('th', attrs={'class':'infobox-label'})
+for th in ths: 
+    if th.text.strip() == 'Total fights':
+        td = th.find_next('td')
+        totalFights = td.text.strip()
+    elif th.text.strip() == 'Wins':
+        td = th.find_next('td')
+        wins = td.text.strip()
+    elif th.text.strip() == 'Wins by KO':
+        td = th.find_next('td')
+        KOs = td.text.strip()
+    elif th.text.strip() == 'Losses':
+        td = th.find_next('td')
+        losses = td.text.strip()
+    elif th.text.strip() == 'Nickname(s)':
+        td = th.find_next('td')
+        nickname = td.text.strip()
+    elif th.text.strip() == 'Draws':
+        td = th.find_next('td')
+        nickname = td.text.strip()
+
+if draws != '': fighterA_Info.extend([totalFights, wins, KOs, losses, nickname, URL, draws])
+else: fighterA_Info.extend([totalFights, wins, KOs, losses, nickname, URL, 0])
+    
+print(fighterA_Info) """
 
 
 
