@@ -109,13 +109,10 @@ class WebScraper:
             nameText = nameText.replace(' (Mexican boxer)', '')
             
         classContent = soup.find(id='mw-content-text')
-        tables = classContent.find_all('table', attrs={'class':'wikitable'})
-            
-        if len(tables) <= 1:
-            fighter_info.extend([nameText, "Empty wiki page"])
-            return fighter_info
-        
         fighterInfoTable = classContent.find('table', attrs={'class':'infobox vcard'})
+        
+        if fighterInfoTable == None: return [nameText, "Empty wiki page"]
+        
         tableBody = fighterInfoTable.find('tbody')
         ths = tableBody.find_all('th', attrs={'class':'infobox-label'})
         
@@ -149,12 +146,12 @@ class WebScraper:
         fights = [] #[[A, B], [A, B]]
         
         for link in fightersLinks:
-            fighterA_Info = [] #[Name, Total fights, wins, KOs, losses, nickname, link, draws]
+            fighterA_Info = [] #[Fight date, Name, Total fights, wins, KOs, losses, nickname, link, draws, date formatted]
             fighterB_Info = [] 
             totalFights, wins, KOs, losses, nickname, draws = '', '', '', '', '', ''
             
             URL = 'https://en.wikipedia.org' + link
-            #print(URL)
+            print(URL)
             page = requests.get(URL)
             soup = BeautifulSoup(page.content, 'lxml')
                 
@@ -202,7 +199,7 @@ class WebScraper:
             else:
                 fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %b %Y")
                 
-            if datetime.today() <= fightDateFormatted + timedelta(days=1):
+            if datetime.today().date() <= fightDateFormatted.date():
                 opponentName = rowOne.find_all('td')[3]
                 firstName = opponentName.text.strip().split(' ')[0]
                 oppLinks = opponentName.find_all('a', href=True)
@@ -212,8 +209,7 @@ class WebScraper:
                         fightersLinks.remove(oppLink['href'])
                     if firstName in oppLink['href']:
                         fighterB_Info = WebScraper.getOpponentsInfo(oppLink['href'])
-                        #print(oppLink['href'])
-
+                        
                 if not fighterB_Info: fighterB_Info.extend([opponentName.text.strip(), "No wiki page for opponent"])
                 
                 nameHeading = soup.find('h1', id='firstHeading')
@@ -249,8 +245,8 @@ class WebScraper:
                         td = th.find_next('td')
                         nickname = td.text.strip()
 
-                if draws != '': fighterA_Info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, draws])
-                else: fighterA_Info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, '0'])
+                if draws != '': fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, draws, fightDateFormatted.date()])
+                else: fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, '0', fightDateFormatted.date()])
                 
                 temp = []
                 temp.append(fighterA_Info)
@@ -259,7 +255,15 @@ class WebScraper:
                 
             else: 
                 continue
-            
+        
+        names = []
+        for fight in fights:
+            if fight[0][1] in names or fight[1][0] in names: 
+                fights.remove(fight)
+                continue
+            names.append(fight[0][1])
+            names.append(fight[1][0])
+         
         return fights
                 
                 

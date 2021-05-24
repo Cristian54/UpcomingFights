@@ -14,12 +14,13 @@ fightersLinks = WebScraper.getWikiLinks(rankings[6], distinctNames)
 
 fights = WebScraper.getUpcomingFights(fightersLinks)
 
-for fight in fights: print(fight)
+for fight in fights: print(fight, "\n")
 print(len(fights))
 
 
 """ import requests
 from bs4 import BeautifulSoup
+from datetime import *
 
 
 URL = 'https://en.wikipedia.org/wiki/Tyson_Fury'
@@ -28,9 +29,6 @@ soup = BeautifulSoup(page.content, 'lxml')
 classContent = soup.find(id='mw-content-text')
 
 tables = classContent.find_all('table', attrs={'class':'wikitable'})
-            
-#if len(tables) <= 1:
-    #continue
 
 firstTable = tables[0].find('tbody')
 firstRow = firstTable.find_all('tr')[0]
@@ -67,7 +65,9 @@ elif fightDate.text.strip().startswith('2021'):
 else:
     fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %b %Y")
     
-if datetime.today() <= fightDateFormatted + timedelta(days=1):
+print(datetime.today().date())
+print(fightDateFormatted.date()) """
+""" if datetime.today() <= fightDateFormatted + timedelta(days=1):
     opponentName = rowOne.find_all('td')[3]
     firstName = opponentName.text.strip().split(' ')[0]
     oppLinks = opponentName.find_all('a', href=True)
