@@ -3,7 +3,7 @@ import sqlite3
 from sqlite3 import Error
 
 def deleteTables(conn):
-    conn.execute("DELETE FROM Fights")
+    #conn.execute("DELETE FROM Fights")
     conn.execute("DELETE FROM Rankings")
     #conn.execute("DROP TABLE Fights")
     
@@ -40,7 +40,11 @@ def createTables(conn):
                 B_DRAWS TEXT NOT NULL,
                 A_LINK TEXT NOT NULL, 
                 B_LINK TEXT NOT NULL, 
-                LOCATION TEXT NOT NULL
+                LOCATION TEXT NOT NULL, 
+                A_HEIGHT TEXT NOT NULL, 
+                B_HEIGHT TEXT NOT NULL,
+                A_REACH TEXT NOT NULL,
+                B_REACH TEXT NOT NULL
             ) """
         conn.execute(sql) 
         
@@ -80,13 +84,13 @@ def populateFights(conn, fights):
         for fight in fights:
             if fight[1][1] == 'Empty wiki page' or fight[1][1] == 'No wiki page for opponent':
                 recordA = fight[0][3] + '-' + fight[0][5]
-                to_db = [fight[0][0], fight[0][9], fight[0][1], fight[1][0], fight[0][6], 'N/A', recordA, 'N/A', fight[0][4], 'N/A', fight[0][8], 'N/A', fight[0][7], 'N/A', fight[0][10]]
-                cur.execute("INSERT INTO Fights VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", to_db)
+                to_db = [fight[0][0], fight[0][9], fight[0][1], fight[1][0], fight[0][6], 'N/A', recordA, 'N/A', fight[0][4], 'N/A', fight[0][8], 'N/A', fight[0][7], 'N/A', fight[0][10], fight[0][11], 'N/A', fight[0][12], 'N/A']
+                cur.execute("INSERT INTO Fights VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", to_db)
             else:
                 recordA = fight[0][3] + '-' + fight[0][5]
                 recordB = fight[1][2] + '-' + fight[1][4]
-                to_db = [fight[0][0], fight[0][9], fight[0][1], fight[1][0], fight[0][6], fight[1][5], recordA, recordB, fight[0][4], fight[1][3], fight[0][8], fight[1][7], fight[0][7], fight[1][6], fight[0][10]]
-                cur.execute("INSERT INTO Fights VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", to_db) 
+                to_db = [fight[0][0], fight[0][9], fight[0][1], fight[1][0], fight[0][6], fight[1][5], recordA, recordB, fight[0][4], fight[1][3], fight[0][8], fight[1][7], fight[0][7], fight[1][6], fight[0][10], fight[0][11], fight[1][8], fight[0][12], fight[1][9]]
+                cur.execute("INSERT INTO Fights VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", to_db) 
                      
         conn.commit()
         cur.close()
@@ -105,7 +109,7 @@ def database():
         
     with conn:
         deleteTables(conn)
-        #createTables(conn)
+        createTables(conn)
         
         rankings = WebScraper.getRankings()
         rankingss = [rankings[0], rankings[1], rankings[2], rankings[3], rankings[4], rankings[5]]

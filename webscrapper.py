@@ -92,8 +92,8 @@ class WebScraper:
        
     @staticmethod
     def getOpponentsInfo(link):
-        fighter_info = [] #[Name, Total fights, wins, KOs, losses, nickname, link, draws]
-        totalFights, wins, KOs, losses, nickname, draws = '', '', '', '', '', ''
+        fighter_info = [] #[Name, Total fights, wins, KOs, losses, nickname, link, draws, height, reach]
+        totalFights, wins, KOs, losses, nickname, draws, height, reach = '', '', '', '', '', '', '', ''
         
         URL = 'https://en.wikipedia.org' + link
         page = requests.get(URL)
@@ -135,9 +135,15 @@ class WebScraper:
             elif th.text.strip() == 'Draws':
                 td = th.find_next('td')
                 draws = td.text.strip()
+            elif th.text.strip() == 'Height':
+                td = th.find_next('td')
+                height = td.text.strip()
+            elif th.text.strip() == 'Reach':
+                td = th.find_next('td')
+                reach = td.text.strip()
 
-        if draws != '': fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, draws])
-        else: fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, '0'])
+        if draws != '': fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, draws, height, reach])
+        else: fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, '0', height, reach])
             
         return fighter_info
         
@@ -146,12 +152,12 @@ class WebScraper:
         fights = [] #[[A, B], [A, B]]
         
         for link in fightersLinks:
-            fighterA_Info = [] #[Fight date, Name, Total fights, wins, KOs, losses, nickname, link, draws, date formatted, location]
+            fighterA_Info = [] #[Fight date, Name, Total fights, wins, KOs, losses, nickname, link, draws, date formatted, location, height, reach]
             fighterB_Info = [] 
-            totalFights, wins, KOs, losses, nickname, draws = '', '', '', '', '', ''
+            totalFights, wins, KOs, losses, nickname, draws, height, reach = '', '', '', '', '', '', '', ''
             
             URL = 'https://en.wikipedia.org' + link
-            print(URL)
+            #print(URL)
             page = requests.get(URL)
             soup = BeautifulSoup(page.content, 'lxml')
                 
@@ -247,9 +253,15 @@ class WebScraper:
                     elif th.text.strip() == 'Draws':
                         td = th.find_next('td')
                         draws = td.text.strip()
+                    elif th.text.strip() == 'Height':
+                        td = th.find_next('td')
+                        height = td.text.strip()
+                    elif th.text.strip() == 'Reach':
+                        td = th.find_next('td')
+                        reach = td.text.strip()
 
-                if draws != '': fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, draws, fightDateFormatted.date(), fightLocation])
-                else: fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, '0', fightDateFormatted.date(), fightLocation])
+                if draws != '': fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, draws, fightDateFormatted.date(), fightLocation, height, reach])
+                else: fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, '0', fightDateFormatted.date(), fightLocation, height, reach])
                 
                 temp = []
                 temp.append(fighterA_Info)

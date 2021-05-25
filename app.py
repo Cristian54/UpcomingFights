@@ -33,9 +33,15 @@ class Fights(db.Model):
     B_RECORD = db.Column(db.String)
     A_KOs = db.Column(db.String)
     B_KOs = db.Column(db.String)
+    A_DRAWS = db.Column(db.String)
+    B_DRAWS = db.Column(db.String)
     A_LINK = db.Column(db.String)
     B_LINK = db.Column(db.String)
     LOCATION = db.Column(db.String)
+    A_HEIGHT = db.Column(db.String)
+    B_HEIGHT = db.Column(db.String)
+    A_REACH = db.Column(db.String)
+    B_REACH = db.Column(db.String)
 
 
 @app.route('/')

@@ -19,25 +19,141 @@
       <a href="/rankings">Current Rankings</a> 
     </div>
 
+    <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+
+    <script>
+        //Get the button:
+        mybutton = document.getElementById("myBtn");
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function() {scrollFunction()};
+        function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            mybutton.style.display = "block";
+        } else {
+            mybutton.style.display = "none";
+        }
+        }
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+          document.body.scrollTop = 0; // For Safari
+          document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }
+    </script>
+
+
     {% for fight in fights%}
       <div class="fight">
 
-        {{fight.FIGHT_DATE}}
-        <br>
-        {% if "N/A" not in fight.LOCATION %}
-          {{fight.LOCATION}}
-          <br>
-        {% endif %}
+        <div class="row">
+          <!-- Date and Location -->
+          <div class="column"></div>
+          <div class="column" style="text-align: center;">
+            <p style="font-weight:900">{{fight.FIGHT_DATE}}</p>
+            {% if "N/A" not in fight.LOCATION %}
+              {{fight.LOCATION}}
+              <br>
+            {% endif %}
+          </div>
+          <div class="column"></div>
 
-        {% if "N/A" not in fight.A_LINK and "N/A" not in fight.B_LINK %}
-          <a href= {{fight.A_LINK}} target="_blank">{{fight.FIGHTER_A}}</a> vs <a href= {{fight.B_LINK}} target="_blank">{{fight.FIGHTER_B}}</a>
-        {% elif "N/A" not in fight.A_LINK and "N/A" in fight.B_LINK %}
-          <a href= {{fight.A_LINK}} target="_blank">{{fight.FIGHTER_A}}</a> vs {{fight.FIGHTER_B}}
-        {% else %}
-          {{fight.FIGHTER_A}} vs {{fight.FIGHTER_B}}
-        {% endif %}
+          <!-- Names and nicknames row -->
+          {% if "N/A" not in fight.A_LINK and "N/A" not in fight.B_LINK %}
+            <div class="column" style="background-color:#bbb; text-align: right;">
+              <a href= {{fight.A_LINK}} target="_blank">{{fight.FIGHTER_A}}</a>
+              {% if "N/A" not in fight.A_NICKNAME and fight.A_NICKNAME != "" %}
+                <p>"{{fight.A_NICKNAME}}"</p>
+              {% endif %}
+            </div>
+            <div class="column" style="background-color:#bbb; text-align: center;">
+              <p style="font-weight:900">VS</p>
+            </div>
+            <div class="column" style="background-color:#bbb; text-align: left;">
+              <a href= {{fight.B_LINK}} target="_blank">{{fight.FIGHTER_B}}</a>
+              {% if fight.B_NICKNAME is defined and "N/A" not in fight.B_NICKNAME and fight.B_NICKNAME != "" %}
+                <p>"{{fight.B_NICKNAME}}"</p>
+              {% endif %}
+            </div>
+
+          {% elif "N/A" not in fight.A_LINK and "N/A" in fight.B_LINK %}
+            <div class="column" style="background-color:#bbb; text-align: right;">
+              <a href= {{fight.A_LINK}} target="_blank">{{fight.FIGHTER_A}}</a>
+              {% if "N/A" not in fight.A_NICKNAME and fight.A_NICKNAME != "" %}
+                <p>"{{fight.A_NICKNAME}}"</p>
+              {% endif %}
+            </div>
+            <div class="column" style="background-color:#bbb; text-align: center;">
+              <p style="font-weight:900">VS</p>
+            </div>
+            <div class="column" style="background-color:#bbb; text-align: left;">
+              {{fight.FIGHTER_B}}
+            </div>
+          {% endif %}
+
+          <!-- Record row -->
+          <div class="column" style="background-color:#bbb; text-align: right;">
+            <p>{{fight.A_RECORD}}</p>
+          </div>
+          <div class="column" style="background-color:#bbb; text-align: center;">
+            <p style="font-weight:900">Record</p>
+          </div>
+          <div class="column" style="background-color:#bbb; text-align: left;">
+            <p>{{fight.B_RECORD}}</p>
+          </div>
+
+          <!-- KOs row -->
+          <div class="column" style="background-color:#bbb; text-align: right;">
+            <p>{{fight.A_KOs}}</p>
+          </div>
+          <div class="column" style="background-color:#bbb; text-align: center;">
+            <p style="font-weight:900">Wins by KO</p>
+          </div>
+          <div class="column" style="background-color:#bbb; text-align: left;">
+            <p>{{fight.B_KOs}}</p>
+          </div>
+
+          <!-- Draws row -->
+          <div class="column" style="background-color:#bbb; text-align: right;">
+            <p>{{fight.A_DRAWS}}</p>
+          </div>
+          <div class="column" style="background-color:#bbb; text-align: center;">
+            <p style="font-weight:900">Draws</p>
+          </div>
+          <div class="column" style="background-color:#bbb; text-align: left;">
+            <p>{{fight.B_DRAWS}}</p>
+          </div>
+          
+          <!-- Heights row -->
+          <div class="column" style="background-color:#bbb; text-align: right;">
+            {% if fight.A_HEIGHT != "" %}
+              <p>{{fight.A_HEIGHT}}</p>
+            {% endif %}
+          </div>
+          <div class="column" style="background-color:#bbb; text-align: center;">
+            <p style="font-weight:900">Height</p>
+          </div>
+          <div class="column" style="background-color:#bbb; text-align: left;">
+            {% if fight.B_HEIGHT != "" %}
+              <p>{{fight.B_HEIGHT}}</p>
+            {% endif %}
+          </div>
+
+        <!-- Reach row -->
+        <div class="column" style="background-color:#bbb; text-align: right;">
+          {% if fight.A_REACH != "" %}
+            <p>{{fight.A_REACH}}</p>
+          {% endif %}
+        </div>
+        <div class="column" style="background-color:#bbb; text-align: center;">
+          <p style="font-weight:900">Reach</p>
+        </div>
+        <div class="column" style="background-color:#bbb; text-align: left;">
+          {% if fight.B_REACH != "" %}
+            <p>{{fight.B_REACH}}</p>
+          {% endif %}
+        </div>
 
       </div>
+    </div>
     {% endfor %}
 
   </body>
@@ -48,11 +164,12 @@
       }
       .fight {
         background-color: gainsboro;
-        border: 10px solid rgb(10, 44, 10);
-        padding: 20px;
+        border: 10px solid #07084b;
+        padding: 15px;
+        padding-bottom: 0%;
         margin: 0 auto;
         margin-bottom: 30px;
-        width: 600px;
+        width: 800px;
         text-align: center;
         font-size: 20px;
       }
@@ -69,6 +186,30 @@
         padding: 14px 16px;
         text-decoration: none;
       }
+      /* Create three equal columns that floats next to each other */
+      .column {
+        float: left;
+        width: 33.33%;
+      }
+      #myBtn {
+            display: none; /* Hidden by default */
+            position: fixed; /* Fixed/sticky position */
+            bottom: 20px; /* Place the button at the bottom of the page */
+            right: 10px; /* Place the button 30px from the right */
+            z-index: 99; /* Make sure it does not overlap */
+            border: none; /* Remove borders */
+            outline: none; /* Remove outline */
+            background-color: rgb(0, 1, 61); /* Set a background color */
+            color: white; /* Text color */
+            cursor: pointer; /* Add a mouse pointer on hover */
+            padding: 15px; /* Some padding */
+            border-radius: 10px; /* Rounded corners */
+            font-size: 18px; /* Increase font size */
+        }
+
+        #myBtn:hover {
+            background-color: rgb(3, 5, 116); /* Add a dark-grey background on hover */
+        }
 
   </style>
 
