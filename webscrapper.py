@@ -276,6 +276,9 @@ class WebScraper:
             if fight[0][1] in names or fight[1][0] in names: 
                 fights.remove(fight)
                 continue
+            if fight[0][1] == "Boxing career of Manny Pacquiao": fight[0][1] = "Manny Pacquiao"
+            elif fight[1][0] == "Boxing career of Manny Pacquiao": fight[1][0] = "Manny Pacquiao"
+                
             names.append(fight[0][1])
             names.append(fight[1][0])
          

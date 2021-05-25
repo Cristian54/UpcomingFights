@@ -1,11 +1,12 @@
 from webscrapper import WebScraper
 import sqlite3
 from sqlite3 import Error
+import schedule
+import time
 
 def deleteTables(conn):
-    #conn.execute("DELETE FROM Fights")
+    conn.execute("DELETE FROM Fights")
     conn.execute("DELETE FROM Rankings")
-    #conn.execute("DROP TABLE Fights")
     
     conn.commit()
     
@@ -100,16 +101,17 @@ def populateFights(conn, fights):
         print(e)
 
 def database():
-    database = r'data/WikipediaData.sqlite'
+    database = r'./data/WikipediaData.sqlite'
     conn = None
     try:
         conn = sqlite3.connect(database)
+        print("s")
     except Error as e:
         print(e)
         
     with conn:
         deleteTables(conn)
-        createTables(conn)
+        #createTables(conn)
         
         rankings = WebScraper.getRankings()
         rankingss = [rankings[0], rankings[1], rankings[2], rankings[3], rankings[4], rankings[5]]
@@ -125,10 +127,13 @@ def database():
         
         fightersLinks = WebScraper.getWikiLinks(rankings[6], distinctNames)
         fights = WebScraper.getUpcomingFights(fightersLinks)
-        populateFights(conn, fights)
-        cur = conn.cursor()
-        cur.execute('UPDATE Fights SET FIGHTER_B = "Manny Pacquiao" WHERE FIGHTER_B = "Boxing career of Manny Pacquiao"')
-        conn.commit()
-        cur.close() 
-        
-database()
+        populateFights(conn, fights) 
+
+
+schedule.every().wednesday.at("06:00").do(database)
+schedule.every().sunday.at("06:00").do(database)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
+
