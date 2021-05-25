@@ -23,12 +23,12 @@ from bs4 import BeautifulSoup
 from datetime import *
 
 
-URL = 'https://en.wikipedia.org/wiki/Tyson_Fury'
+URL = 'https://en.wikipedia.org/wiki/Brandon_Figueroa'
 page = requests.get(URL)
 soup = BeautifulSoup(page.content, 'lxml')
-classContent = soup.find(id='mw-content-text')
+classContent = soup.find(id='mw-content-text') """
 
-tables = classContent.find_all('table', attrs={'class':'wikitable'})
+""" tables = classContent.find_all('table', attrs={'class':'wikitable'})
 
 firstTable = tables[0].find('tbody')
 firstRow = firstTable.find_all('tr')[0]
@@ -65,15 +65,18 @@ elif fightDate.text.strip().startswith('2021'):
 else:
     fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %b %Y")
     
-print(datetime.today().date())
-print(fightDateFormatted.date()) """
-""" if datetime.today() <= fightDateFormatted + timedelta(days=1):
-    opponentName = rowOne.find_all('td')[3]
+
+if datetime.today() <= fightDateFormatted + timedelta(days=1):
+    rowOneTDs = rowOne.find_all('td')
+    opponentName = rowOneTDs[3]
     firstName = opponentName.text.strip().split(' ')[0]
     oppLinks = opponentName.find_all('a', href=True)
     for oppLink in oppLinks:
         if firstName in oppLink['href']:
-            print(oppLink['href']) """
+            print(oppLink['href'])
+    
+    fightLocation = rowOneTDs[7].text.strip()
+    print(fightLocation) """
 
 """ fighterA_Info = [] #[Name, Total fights, wins, KOs, losses, nickname, link, draws]
 totalFights, wins, KOs, losses, nickname, draws = '', '', '', '', '', '' 
@@ -97,14 +100,15 @@ for th in ths:
     elif th.text.strip() == 'Nickname(s)':
         td = th.find_next('td')
         nickname = td.text.strip()
+        print(nickname)
     elif th.text.strip() == 'Draws':
         td = th.find_next('td')
-        nickname = td.text.strip()
+        draws = td.text.strip()
 
 if draws != '': fighterA_Info.extend([totalFights, wins, KOs, losses, nickname, URL, draws])
 else: fighterA_Info.extend([totalFights, wins, KOs, losses, nickname, URL, 0])
     
-print(fighterA_Info) """
+print(fighterA_Info) """ 
 
 
 

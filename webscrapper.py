@@ -134,7 +134,7 @@ class WebScraper:
                 nickname = td.text.strip()
             elif th.text.strip() == 'Draws':
                 td = th.find_next('td')
-                nickname = td.text.strip()
+                draws = td.text.strip()
 
         if draws != '': fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, draws])
         else: fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, '0'])
@@ -146,7 +146,7 @@ class WebScraper:
         fights = [] #[[A, B], [A, B]]
         
         for link in fightersLinks:
-            fighterA_Info = [] #[Fight date, Name, Total fights, wins, KOs, losses, nickname, link, draws, date formatted]
+            fighterA_Info = [] #[Fight date, Name, Total fights, wins, KOs, losses, nickname, link, draws, date formatted, location]
             fighterB_Info = [] 
             totalFights, wins, KOs, losses, nickname, draws = '', '', '', '', '', ''
             
@@ -200,7 +200,8 @@ class WebScraper:
                 fightDateFormatted = datetime.strptime(fightDate.text.strip(), "%d %b %Y")
                 
             if datetime.today().date() <= fightDateFormatted.date():
-                opponentName = rowOne.find_all('td')[3]
+                rowOneTDs = rowOne.find_all('td')
+                opponentName = rowOneTDs[3]
                 firstName = opponentName.text.strip().split(' ')[0]
                 oppLinks = opponentName.find_all('a', href=True)
                 
@@ -211,6 +212,8 @@ class WebScraper:
                         fighterB_Info = WebScraper.getOpponentsInfo(oppLink['href'])
                         
                 if not fighterB_Info: fighterB_Info.extend([opponentName.text.strip(), "No wiki page for opponent"])
+                
+                fightLocation = rowOneTDs[7].text.strip()
                 
                 nameHeading = soup.find('h1', id='firstHeading')
                 nameText = nameHeading.get_text()
@@ -243,10 +246,10 @@ class WebScraper:
                         nickname = td.text.strip()
                     elif th.text.strip() == 'Draws':
                         td = th.find_next('td')
-                        nickname = td.text.strip()
+                        draws = td.text.strip()
 
-                if draws != '': fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, draws, fightDateFormatted.date()])
-                else: fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, '0', fightDateFormatted.date()])
+                if draws != '': fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, draws, fightDateFormatted.date(), fightLocation])
+                else: fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, '0', fightDateFormatted.date(), fightLocation])
                 
                 temp = []
                 temp.append(fighterA_Info)

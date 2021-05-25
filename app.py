@@ -1,4 +1,3 @@
-from webscrapper import WebScraper
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
@@ -6,7 +5,6 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data/WikipediaData.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-#app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
 class Rankings(db.Model):
@@ -22,11 +20,29 @@ class Rankings(db.Model):
     WEIGHT_CLASS = db.Column(db.String)
     dummyCol = db.Column(db.Integer, primary_key=True)
 
+class Fights(db.Model):
+    __tablename__ = 'Fights'
+    __table_args__ = { 'extend_existing': True }
+    FIGHT_DATE = db.Column(db.String) 
+    DATE_FORMATTED = db.Column(db.Date)
+    FIGHTER_A = db.Column(db.String, primary_key=True) 
+    FIGHTER_B = db.Column(db.String)  
+    A_NICKNAME = db.Column(db.String)
+    B_NICKNAME = db.Column(db.String)
+    A_RECORD = db.Column(db.String)
+    B_RECORD = db.Column(db.String)
+    A_KOs = db.Column(db.String)
+    B_KOs = db.Column(db.String)
+    A_LINK = db.Column(db.String)
+    B_LINK = db.Column(db.String)
+    LOCATION = db.Column(db.String)
+
+
 @app.route('/')
 def home_page(): 
-    #[[Date, FighterA, FighterB, RecordA, recordB]]
-    test = [['Sept 18', 'Canelo', 'Plant', '55-1', '21-0'], ['Dec', 'Fury', 'Joshua', '30-0', '22-1'], ['Aug', 'Spence', 'Pac', '29-0', '67-7']]
-    return render_template('home.html', fights=test)
+    fightList = []
+    fightList = db.session.query(Fights).order_by(Fights.DATE_FORMATTED.asc()).all()
+    return render_template('home.html', fights=fightList)
 
 @app.route('/rankings')
 def rankings():
