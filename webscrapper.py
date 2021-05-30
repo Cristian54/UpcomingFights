@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import *
+import re
 
 class WebScraper: 
     @staticmethod
@@ -93,7 +94,7 @@ class WebScraper:
     @staticmethod
     def getOpponentsInfo(link):
         fighter_info = [] #[Name, Total fights, wins, KOs, losses, nickname, link, draws, height, reach]
-        totalFights, wins, KOs, losses, nickname, draws, height, reach = '', '', '', '', '', '', '', ''
+        totalFights, wins, KOs, losses, nickname, draws, height, reach, age = '', '', '', '', '', '', '', '', ''
         
         URL = 'https://en.wikipedia.org' + link
         page = requests.get(URL)
@@ -141,9 +142,15 @@ class WebScraper:
             elif th.text.strip() == 'Reach':
                 td = th.find_next('td')
                 reach = td.text.strip()
+            elif th.text.strip() == 'Born':
+                td = th.find_next('td')
+                string = td.text.strip()
+                if 'age' in string:
+                    pattern = "\(age(.*?)\)"
+                    age = re.search(pattern, string).group(1)
 
-        if draws != '': fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, draws, height, reach])
-        else: fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, '0', height, reach])
+        if draws != '': fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, draws, height, reach, age])
+        else: fighter_info.extend([nameText, totalFights, wins, KOs, losses, nickname, URL, '0', height, reach, age])
             
         return fighter_info
         
@@ -152,9 +159,9 @@ class WebScraper:
         fights = [] #[[A, B], [A, B]]
         
         for link in fightersLinks:
-            fighterA_Info = [] #[Fight date, Name, Total fights, wins, KOs, losses, nickname, link, draws, date formatted, location, height, reach]
+            fighterA_Info = [] #[Fight date, Name, Total fights, wins, KOs, losses, nickname, link, draws, date formatted, location, height, reach, age]
             fighterB_Info = [] 
-            totalFights, wins, KOs, losses, nickname, draws, height, reach = '', '', '', '', '', '', '', ''
+            totalFights, wins, KOs, losses, nickname, draws, height, reach, age = '', '', '', '', '', '', '', '', ''
             
             URL = 'https://en.wikipedia.org' + link
             #print(URL)
@@ -259,9 +266,15 @@ class WebScraper:
                     elif th.text.strip() == 'Reach':
                         td = th.find_next('td')
                         reach = td.text.strip()
+                    elif th.text.strip() == 'Born':
+                        td = th.find_next('td')
+                        string = td.text.strip()
+                        if 'age' in string:
+                            pattern = "\(age(.*?)\)"
+                            age = re.search(pattern, string).group(1)
 
-                if draws != '': fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, draws, fightDateFormatted.date(), fightLocation, height, reach])
-                else: fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, '0', fightDateFormatted.date(), fightLocation, height, reach])
+                if draws != '': fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, draws, fightDateFormatted.date(), fightLocation, height, reach, age])
+                else: fighterA_Info.extend([fightDate.text.strip(), nameText, totalFights, wins, KOs, losses, nickname, URL, '0', fightDateFormatted.date(), fightLocation, height, reach, age])
                 
                 temp = []
                 temp.append(fighterA_Info)

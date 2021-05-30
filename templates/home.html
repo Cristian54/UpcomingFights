@@ -40,8 +40,12 @@
         }
     </script>
 
+    
+    <h3 style="color: white; text-align: center; padding: 20px;">Upcoming ({{fightsCount}})</h3>
+
 
     {% for fight in fights%}
+      {% set division = divisions[loop.index-1] %}
       <div class="fight">
 
         <div class="row">
@@ -55,6 +59,15 @@
             {% endif %}
           </div>
           <div class="column"></div>
+
+          <!-- Weight class row -->
+          {% if "N/A" not in division%}
+          <div class="column" style="background-color:#bbb;"></div>
+          <div class="column" style="text-align: center; background-color:#bbb; padding-bottom: 5px;">
+            <p style="font-weight:900">{{division}}</p>
+          </div>
+          <div class="column" style="background-color:#bbb;"></div>
+          {% endif %}
 
           <!-- Names and nicknames row -->
           {% if "N/A" not in fight.A_LINK and "N/A" not in fight.B_LINK %}
@@ -122,6 +135,23 @@
             <p>{{fight.B_DRAWS}}</p>
           </div>
           
+
+          <!-- Ages row -->
+          <div class="column" style="background-color:#bbb; text-align: right;">
+            {% if fight.A_AGE != "" %}
+              <p>{{fight.A_AGE}}</p>
+            {% endif %}
+          </div>
+          <div class="column" style="background-color:#bbb; text-align: center;">
+            <p style="font-weight:900">Age</p>
+          </div>
+          <div class="column" style="background-color:#bbb; text-align: left;">
+            {% if fight.B_AGE != "" %}
+              <p>{{fight.B_AGE}}</p>
+            {% endif %}
+          </div>
+
+
           <!-- Heights row -->
           <div class="column" style="background-color:#bbb; text-align: right;">
             {% if fight.A_HEIGHT != "" %}

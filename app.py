@@ -42,13 +42,28 @@ class Fights(db.Model):
     B_HEIGHT = db.Column(db.String)
     A_REACH = db.Column(db.String)
     B_REACH = db.Column(db.String)
+    A_AGE = db.Column(db.String)
+    B_AGE = db.Column(db.String)
 
 
 @app.route('/')
 def home_page(): 
     fightList = []
     fightList = db.session.query(Fights).order_by(Fights.DATE_FORMATTED.asc()).all()
-    return render_template('home.html', fights=fightList)
+    numOfFights = db.session.query(Fights).count()
+    
+    weights = []
+    weightsDict = {"HW": "Heavyweight", "CW": "Cruiserweight", "LHW": "Light Heavyweight", "SMW": "Super Middleweight", "MW":"Middleweight",
+                   "LMW":"Light Middleweight", "WW":"Welterweight", "SLW":"Super Lightweight", "LW":"Lightweight", "SFW":"Super Featherweight", 
+                   "FW":"Featherweight", "SBW":"Super Bantamweight", "BW":"Bantamweight", "115":"Super Flyweight",
+                   "112":"Flyweight", "108":"Light Flyweight", "105":"Minimumweight"}
+    for fight in fightList:
+        weight = db.session.query(Rankings.WEIGHT_CLASS).filter((Rankings.TBRB == fight.FIGHTER_A) | (Rankings.RING == fight.FIGHTER_A)).first()
+        if weight != None:
+            if weight[0] in weightsDict.keys(): weights.append(weightsDict.get(weight[0]))
+        else: weights.append('N/A')
+          
+    return render_template('home.html', fights=fightList, fightsCount=numOfFights, divisions=weights)
 
 @app.route('/rankings')
 def rankings():
@@ -86,5 +101,5 @@ def rankings():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
     
