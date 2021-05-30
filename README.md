@@ -1,0 +1,1 @@
+Website made with Flask that displays upcoming boxing matches from current world champions and top 10 ranked contenders from every weight class. Data was gathered from [this wikipedia page](https://en.wikipedia.org/wiki/List_of_current_boxing_rankings) using BeautifulSoup4. 
